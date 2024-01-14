@@ -74,7 +74,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // Load command line options.
-    let options = Options::new();
+    let mut options = Options::new();
+
+    // override command to execute (`-e` option) to use `hx`
+    let hx = env::current_exe()?.parent().unwrap().join("hx");
+    // if the `hx` binary is in the same directory as the `helixitty` binary, use it. Otherwise, use the system hx.
+    let hx =
+        if hx.exists() { hx.as_os_str().to_string_lossy().to_string() } else { String::from("hx") };
+
+    options.window_options.terminal_options.command =
+        [vec![hx], options.window_options.terminal_options.helix_args.clone().unwrap_or_default()]
+            .concat();
 
     match options.subcommands {
         #[cfg(unix)]
@@ -153,9 +163,9 @@ fn alacritty(mut options: Options) -> Result<(), Box<dyn Error>> {
         env::set_var(key, value);
     }
 
-    // Switch to home directory.
-    #[cfg(target_os = "macos")]
-    env::set_current_dir(home::home_dir().unwrap()).unwrap();
+    // Switch to home directory. It makes sense to do this as a terminal emulator, but as a text editor it doesn't.
+    // #[cfg(target_os = "macos")]
+    // env::set_current_dir(home::home_dir().unwrap()).unwrap();
 
     // Set macOS locale.
     #[cfg(target_os = "macos")]

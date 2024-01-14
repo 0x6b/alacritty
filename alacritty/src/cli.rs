@@ -159,9 +159,15 @@ pub struct TerminalOptions {
     #[clap(long)]
     pub hold: bool,
 
-    /// Command and args to execute (must be last argument).
-    #[clap(short = 'e', long, allow_hyphen_values = true, num_args = 1..)]
-    command: Vec<String>,
+    /// Command and args to execute. This will be always be set to the `hx` so mark it as skipped. In order to override
+    /// the command during the startup, I made it to be public.
+    #[clap(skip)]
+    pub command: Vec<String>,
+
+    /// Args to pass to the helix.
+    /// If I want to launch hx with its own options e.g. `--vsplit`, etc., I should pass after the `--` separator.
+    #[clap()]
+    pub helix_args: Option<Vec<String>>,
 }
 
 impl TerminalOptions {

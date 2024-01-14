@@ -9,6 +9,10 @@ homepage = "https://github.com/alacritty/alacritty"
 edition = "2021"
 rust-version = "1.70.0"
 
+[[bin]]
+name = "helixitty"
+path = "src/main.rs"
+
 [dependencies.alacritty_terminal]
 path = "../alacritty_terminal"
 version = "0.21.0"
