@@ -78,7 +78,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // override command to execute (`-e` option) to use `hx`
     let hx = env::current_exe()?.parent().unwrap().join("hx");
-    // if the `hx` binary is in the same directory as the `helixitty` binary, use it. Otherwise, use the system hx.
+    // if the `hx` binary is in the same directory as the `helixitty` binary, use it. Otherwise, use
+    // the system hx.
     let hx =
         if hx.exists() { hx.as_os_str().to_string_lossy().to_string() } else { String::from("hx") };
 
@@ -163,9 +164,14 @@ fn alacritty(mut options: Options) -> Result<(), Box<dyn Error>> {
         env::set_var(key, value);
     }
 
-    // Switch to home directory. It makes sense to do this as a terminal emulator, but as a text editor it doesn't.
-    // #[cfg(target_os = "macos")]
-    // env::set_current_dir(home::home_dir().unwrap()).unwrap();
+    // If no helix args, switch to home directory.
+    #[cfg(target_os = "macos")]
+    if options.window_options.terminal_options.helix_args.is_none() {
+        env::set_current_dir(home::home_dir().unwrap()).unwrap();
+    }
+
+    // Change default window title to Helixitty.
+    options.window_options.window_identity.title = Some("Helixitty".to_string());
 
     // Set macOS locale.
     #[cfg(target_os = "macos")]
